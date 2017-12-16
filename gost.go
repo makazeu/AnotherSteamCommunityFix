@@ -36,7 +36,7 @@ func NewGost(chainNodes, serveNodes StringList) *GostRoutes {
 	return &gostRoute
 }
 
-func (route *GostRoutes) StartServing()  {
+func (route *GostRoutes) StartGostServing()  {
 	// generate random self-signed certificate.
 	cert, err := gost.GenCertificate()
 	if err != nil {

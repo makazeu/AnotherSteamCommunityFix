@@ -6,20 +6,28 @@ import (
 	"os"
 	"os/signal"
 	"fmt"
+	"flag"
+	"net/http"
+)
+
+const (
+	Lredirect = iota + 1
+	Lproxy
 )
 
 var (
-	version = "0.1"
+	version    = "0.2"
 	domainName = "steamcommunity.com"
+	dnsServer  = "208.67.222.222:5353"
+
+	mode                 int
 	chainNode, serveNode ascf.StringList
 )
 
 func init() {
+	flag.IntVar(&mode, "mode", Lredirect, "1-转发模式、2-代理模式")
+	flag.Parse()
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
-
-	serveNode = append(serveNode, "tcp://:80/" + domainName + ":80")
-	serveNode = append(serveNode, "tcp://:443/" + domainName + ":443")
-	chainNode = append(chainNode, ProxyServer)
 }
 
 func main() {
@@ -29,11 +37,30 @@ func main() {
 	interrupt := make(chan os.Signal)
 	signal.Notify(interrupt, os.Interrupt)
 
-	var routes = ascf.NewGost(chainNode, serveNode)
-	go routes.StartServing()
+	if mode == Lredirect {
+		fmt.Println("程序设定为转发模式")
+		address, err := ascf.LookUp(domainName, dnsServer, 10)
+		if err != nil {
+			log.Fatal(err)
+		}
 
+		go ascf.StartServingHTTPRedirect(http.StatusFound)
+		go ascf.StartServingTCPProxy(":443", address[0].String()+":443")
+	} else if mode == Lproxy {
+		fmt.Println("程序设定为代理模式")
+
+		serveNode = append(serveNode, "tcp://:80/"+domainName+":80")
+		serveNode = append(serveNode, "tcp://:443/"+domainName+":443")
+		chainNode = append(chainNode, ProxyServer)
+		var routes = ascf.NewGost(chainNode, serveNode)
+		go routes.StartGostServing()
+	} else {
+		log.Fatal("illegal argument")
+	}
+
+	fmt.Println("程序已经启动，正在监听80和443端口，现在可正常访问Steam社区！")
 	select {
-	case <- interrupt:
+	case <-interrupt:
 		removeHosts()
 	}
 }
@@ -44,7 +71,7 @@ func addHosts() {
 	}
 }
 
-func removeHosts()  {
+func removeHosts() {
 	if err := ascf.RemoveHosts("127.0.0.1", domainName); err != nil {
 		log.Fatal(err)
 	}
@@ -54,5 +81,4 @@ func sayHello() {
 	fmt.Printf("~ 欢迎使用AnotherSteamCommunityFix v%s ~\n", version)
 	fmt.Println("Author: Makazeu [ Steam: Makazeu | Weibo: @Makazeu ]")
 	fmt.Println()
-	fmt.Println("程序已经启动，正在监听80和443端口，现在可正常访问Steam社区！")
 }
