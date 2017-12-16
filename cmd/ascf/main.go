@@ -5,9 +5,11 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"fmt"
 )
 
 var (
+	version = "0.1"
 	domainName = "steamcommunity.com"
 	chainNode, serveNode ascf.StringList
 )
@@ -21,6 +23,7 @@ func init() {
 }
 
 func main() {
+	sayHello()
 	addHosts()
 
 	interrupt := make(chan os.Signal)
@@ -45,4 +48,11 @@ func removeHosts()  {
 	if err := ascf.RemoveHosts("127.0.0.1", domainName); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func sayHello() {
+	fmt.Printf("~ 欢迎使用AnotherSteamCommunityFix v%s ~\n", version)
+	fmt.Println("Author: Makazeu [ Steam: Makazeu | Weibo: @Makazeu ]")
+	fmt.Println()
+	fmt.Println("程序已经启动，正在监听80和443端口，现在可正常访问Steam社区！")
 }
