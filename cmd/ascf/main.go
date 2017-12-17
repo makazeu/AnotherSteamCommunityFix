@@ -1,4 +1,4 @@
-package main
+﻿package main
 
 import (
 	ascf "github.com/zyfworks/AnotherSteamCommunityFix"
@@ -16,16 +16,19 @@ const (
 )
 
 var (
-	version    = "0.2"
+	version    = "1.0"
 	domainName = "steamcommunity.com"
 	dnsServer  = "208.67.222.222:5353"
+	defaultIP  = "104.115.125.124"
 
 	mode                 int
+	fixedIP              string
 	chainNode, serveNode ascf.StringList
 )
 
 func init() {
 	flag.IntVar(&mode, "mode", Lredirect, "1-转发模式、2-代理模式")
+	flag.StringVar(&fixedIP, "ip", defaultIP, "备用的IP地址")
 	flag.Parse()
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 }
@@ -38,14 +41,20 @@ func main() {
 	signal.Notify(interrupt, os.Interrupt)
 
 	if mode == Lredirect {
+		var ipAddr string
 		fmt.Println("程序设定为转发模式")
+
 		address, err := ascf.LookUp(domainName, dnsServer, 10)
 		if err != nil {
-			log.Fatal(err)
+			ipAddr = fixedIP
+			log.Println("域名解析失败，使用备用IP地址：", ipAddr)
+		} else {
+			ipAddr = address[0].String()
+			log.Println("域名解析成功：", ipAddr)
 		}
 
 		go ascf.StartServingHTTPRedirect(http.StatusFound)
-		go ascf.StartServingTCPProxy(":443", address[0].String()+":443")
+		go ascf.StartServingTCPProxy(":443", ipAddr+":443")
 	} else if mode == Lproxy {
 		fmt.Println("程序设定为代理模式")
 
