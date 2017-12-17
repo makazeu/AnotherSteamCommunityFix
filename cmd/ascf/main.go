@@ -38,6 +38,7 @@ func main() {
 	addHosts()
 
 	interrupt := make(chan os.Signal)
+	signal.Notify(interrupt, os.Kill)
 	signal.Notify(interrupt, os.Interrupt)
 
 	if mode == Lredirect {
