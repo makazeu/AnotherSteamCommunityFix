@@ -12,7 +12,7 @@ func AddHosts(ip string, hostEntries... string) error {
 	}
 
 	if !hosts.IsWritable() {
-		return errors.New("host file not writable, try running with elevated privileges")
+		return errors.New("hosts文件不可写，请以更高的权限运行")
 	}
 
 	if err = hosts.Add(ip, hostEntries...); err != nil {
@@ -29,7 +29,7 @@ func RemoveHosts(ip string, hostEntries... string) error {
 	}
 
 	if !hosts.IsWritable() {
-		return errors.New("host file not writable, try running with elevated privileges")
+		return errors.New("hosts文件不可写，请以更高的权限运行")
 	}
 
 	if err = hosts.Remove(ip, hostEntries...); err != nil {

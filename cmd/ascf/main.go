@@ -57,14 +57,16 @@ func main() {
 		go ascf.StartServingTCPProxy(":443", ipAddr+":443")
 	} else if mode == Lproxy {
 		fmt.Println("程序设定为代理模式")
-
 		serveNode = append(serveNode, "tcp://:80/"+domainName+":80")
 		serveNode = append(serveNode, "tcp://:443/"+domainName+":443")
+
+		// 代理服务器：请新建一个go文件，定义ProxyServer变量
+		// 如 var ProxyServer = "kcp://8.8.8.8:8888"
 		chainNode = append(chainNode, ProxyServer)
 		var routes = ascf.NewGost(chainNode, serveNode)
 		go routes.StartGostServing()
 	} else {
-		log.Fatal("illegal argument")
+		log.Fatal("程序参数错误")
 	}
 
 	fmt.Println("程序已经启动，正在监听80和443端口，现在可正常访问Steam社区！")

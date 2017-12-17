@@ -16,7 +16,7 @@ func LookUp(domainName, dnsServer string, retry int) ([]net.IP, error) {
 	for i := 1; i <= retry; i++ {
 		r, t, err := client.Exchange(msg, dnsServer)
 		if err == nil && len(r.Answer) != 0 {
-			log.Printf("Name resolution took %v\n", t)
+			log.Printf("域名解析耗时 %v\n", t)
 			for _,ans := range r.Answer  {
 				ip := ans.(*dns.A).A
 				address = append(address, ip)
@@ -24,5 +24,5 @@ func LookUp(domainName, dnsServer string, retry int) ([]net.IP, error) {
 			return address, nil
 		}
 	}
-	return nil, errors.New("domain resolution failed")
+	return nil, errors.New("域名解析失败")
 }
