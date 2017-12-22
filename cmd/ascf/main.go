@@ -16,7 +16,7 @@ const (
 )
 
 var (
-	version    = "1.0.1"
+	version    = "1.1.0"
 	domainName = "steamcommunity.com"
 	dnsServer  = "208.67.222.222:5353"
 	defaultIP  = "184.28.244.201"
@@ -28,7 +28,7 @@ var (
 
 func init() {
 	flag.IntVar(&mode, "mode", Lredirect, "1-转发模式、2-代理模式")
-	flag.StringVar(&fixedIP, "ip", defaultIP, "备用的IP地址")
+	flag.StringVar(&fixedIP, "ip", "", "手动指定IP地址")
 	flag.Parse()
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 }
@@ -45,13 +45,18 @@ func main() {
 		var ipAddr string
 		fmt.Println("程序设定为转发模式")
 
-		address, err := ascf.LookUp(domainName, dnsServer, 10)
-		if err != nil {
-			ipAddr = fixedIP
-			log.Println("域名解析失败，使用备用IP地址：", ipAddr)
+		if len(fixedIP) == 0 {
+			address, err := ascf.LookUp(domainName, dnsServer, 10)
+			if err != nil {
+				ipAddr = defaultIP
+				log.Println("域名解析失败，使用备用IP地址：", ipAddr)
+			} else {
+				ipAddr = address[0].String()
+				log.Println("域名解析成功：", ipAddr)
+			}
 		} else {
-			ipAddr = address[0].String()
-			log.Println("域名解析成功：", ipAddr)
+			ipAddr = fixedIP
+			log.Println("使用手动指定的IP地址：", ipAddr)
 		}
 
 		go ascf.StartServingHTTPRedirect(http.StatusFound)
@@ -75,7 +80,7 @@ func main() {
 
 	fmt.Println()
 	fmt.Println("对于Mac和Linux用户，使用nohup命令运行程序可使其在后台运行。")
-	fmt.Println("\t└─在终端中进入程序所在目录后执行 “nohup sudo ./ascf &”即可。")
+	fmt.Println("\t└─ 在终端中进入程序所在目录后执行 “nohup sudo ./ascf &”即可。")
 	select {
 	case <-interrupt:
 		removeHosts()
