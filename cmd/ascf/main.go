@@ -16,10 +16,10 @@ const (
 )
 
 var (
-	version    = "1.0"
+	version    = "1.0.1"
 	domainName = "steamcommunity.com"
 	dnsServer  = "208.67.222.222:5353"
-	defaultIP  = "104.115.125.124"
+	defaultIP  = "184.28.244.201"
 
 	mode                 int
 	fixedIP              string
@@ -71,6 +71,11 @@ func main() {
 	}
 
 	fmt.Println("程序已经启动，正在监听80和443端口，现在可正常访问Steam社区！")
+	fmt.Println("此时请不要关闭该窗口，否则程序将会退出！")
+
+	fmt.Println()
+	fmt.Println("对于Mac和Linux用户，使用nohup命令运行程序可使其在后台运行。")
+	fmt.Println("\t└─在终端中进入程序所在目录后执行 “nohup sudo ./ascf &”即可。")
 	select {
 	case <-interrupt:
 		removeHosts()
