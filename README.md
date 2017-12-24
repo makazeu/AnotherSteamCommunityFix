@@ -23,15 +23,24 @@ ASCF会修改hosts文件，把steamcommunity.com域名指向本地（127.0.0.1�
 当程序解析域名失败时，会使用备用IP进行连接，默认备用IP为`104.115.125.124`，您也可以手动指定这个备用IP：
 ```./ascf.exe -ip=xxx.xxx.xxx.xxx```
 
-## 使用说明
+## 注意事项
 * 访问Steam社区时必须保持该程序运行！
 * 如果出现闪退，请使用管理员权限启动，并确保系统中没有其他程序占用80和443端口。
 * 第一次使用前请先清空hosts文件中和steamcommunity.com相关的条目。
-* 树莓派用户请使用linux_arm版！
+* 树莓派2及以上请使用ascf_Linux_ARMv7、树莓派1请使用ascf_linux_ARMv6、64位ARM平台请使用ascf_linux_ARMv8。
 
-## Linux使用
-在Linux服务器上挂卡的朋友们，如果你用的是x64的Linux，那么下载linux_amd64版的，把可执行文件上传至服务器，使用超级用户运行：
-```sudo ./ascf```
-或是后台运行 
-```sudo nohup ./ascf &```
-之后steamcommunity.com便可访问。
+## Linux/macOS使用指南
+1. 下载并解压缩
+2. 打开终端（Terminal），进入到ascf程序目录：
+   如ascf程序在 /User/Makazeu/Downloads/ascf_darwin_amd64/文件夹中，那么在终端中输入:
+   ```cd /User/Makazeu/Downloads/ascf_darwin_amd64/```
+3. 赋予程序可执行权限，在终端中输入命令：
+   ```chmod +x ./ascf```
+4. 使用root用户（管理员用户）运行程序，在终端中输入：
+   ```sudo ./ascf```
+   输入root用户密码后，看程序是否运行。
+   因为程序涉及到hosts文件修改，需要高权限，所以你需要输入root密码
+6. 若程序已经成功运行，此时就不要关闭终端窗口了，否则程序就会退出！试下Steam社区能否正常打开。
+7. 一切都没问题后，在终端窗口中退出程序（按Ctrl+C），然后以后台的方式运行程序，输入
+   ```nohup sudo ./ascf &```
+8. 之后就可以关闭终端窗口了，此时程序在后台运行！此时，steamcommunity.com便可访问。
