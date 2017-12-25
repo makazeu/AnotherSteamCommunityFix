@@ -16,7 +16,7 @@ const (
 )
 
 var (
-	version    = "1.1.0"
+	version    = "1.1.1"
 	domainName = "steamcommunity.com"
 	dnsServer  = "208.67.222.222:5353"
 	defaultIP  = "184.28.244.201"

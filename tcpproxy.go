@@ -35,7 +35,7 @@ func handleConn(conn net.Conn, remote string)  {
 }
 
 func StartServingTCPProxy(local, remote string)  {
-	listener, err := net.Listen("tcp", local)
+	listener, err := net.Listen("tcp4", local)
 	if err != nil {
 		log.Fatal("listen tcp error:", err)
 	}
