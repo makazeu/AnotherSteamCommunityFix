@@ -2,7 +2,6 @@ package AnotherSteamCommunityFix
 
 import (
 	"net/http"
-	"log"
 	"net"
 )
 
@@ -18,7 +17,7 @@ func redirect(w http.ResponseWriter, req *http.Request) {
 
 func StartServingHTTPRedirect(httpCode int) {
 	statusCode = httpCode
-	log.Fatal(ListenAndServe(":80", http.HandlerFunc(redirect)))
+	fatalLogger.Fatal(ListenAndServe(":80", http.HandlerFunc(redirect)))
 }
 
 type Server struct {

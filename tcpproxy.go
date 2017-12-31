@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func pipeAndClose(src, dst net.Conn)  {
+func pipeAndClose(src, dst net.Conn) {
 	buf := make([]byte, 81920)
 	for {
 		n, err := src.Read(buf)
@@ -20,10 +20,10 @@ func pipeAndClose(src, dst net.Conn)  {
 	}
 }
 
-func handleConn(conn net.Conn, remote string)  {
+func handleConn(conn net.Conn, remote string) {
 	defer conn.Close()
 
-	remoteConn, err := net.DialTimeout("tcp", remote, 15 * time.Second)
+	remoteConn, err := net.DialTimeout("tcp", remote, 15*time.Second)
 	if err != nil {
 		log.Println("dial remote error:", err)
 		return
@@ -34,16 +34,16 @@ func handleConn(conn net.Conn, remote string)  {
 	pipeAndClose(conn, remoteConn)
 }
 
-func StartServingTCPProxy(local, remote string)  {
+func StartServingTCPProxy(local, remote string) {
 	listener, err := net.Listen("tcp4", local)
 	if err != nil {
-		log.Fatal("listen tcp error:", err)
+		fatalLogger.Fatal("listen tcp error:", err)
 	}
 
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			log.Fatal("accept tcp error:", err)
+			fatalLogger.Fatal("accept tcp error:", err)
 		}
 		go handleConn(conn, remote)
 	}

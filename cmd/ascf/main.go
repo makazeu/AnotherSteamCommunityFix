@@ -1,36 +1,29 @@
 ﻿package main
 
 import (
-	ascf "github.com/zyfworks/AnotherSteamCommunityFix"
 	"log"
 	"os"
 	"os/signal"
 	"fmt"
 	"flag"
 	"net/http"
-)
 
-const (
-	Lredirect = iota + 1
-	Lproxy
+	ascf "github.com/zyfworks/AnotherSteamCommunityFix"
 )
 
 var (
-	version    = "1.1.1"
+	version    = "1.2.0"
 	domainName = "steamcommunity.com"
 	dnsServer  = "208.67.222.222:5353"
 	defaultIP  = "104.125.0.135"
 
-	mode                 int
-	fixedIP              string
-	chainNode, serveNode ascf.StringList
+	fixedIP string
 )
 
 func init() {
-	flag.IntVar(&mode, "mode", Lredirect, "1-转发模式、2-代理模式")
 	flag.StringVar(&fixedIP, "ip", "", "手动指定IP地址")
 	flag.Parse()
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	log.SetFlags(log.Lshortfile)
 }
 
 func main() {
@@ -41,46 +34,39 @@ func main() {
 	signal.Notify(interrupt, os.Kill)
 	signal.Notify(interrupt, os.Interrupt)
 
-	if mode == Lredirect {
-		var ipAddr string
-		fmt.Println("程序设定为转发模式")
-
-		if len(fixedIP) == 0 {
-			address, err := ascf.LookUp(domainName, dnsServer, 10)
-			if err != nil {
-				ipAddr = defaultIP
-				log.Println("域名解析失败，使用备用IP地址：", ipAddr)
-			} else {
-				ipAddr = address[0].String()
-				log.Println("域名解析成功：", ipAddr)
-			}
-		} else {
-			ipAddr = fixedIP
-			log.Println("使用手动指定的IP地址：", ipAddr)
+	log.Println("正在获取IP地址，请稍候~")
+	var ipAddr string
+	if len(fixedIP) == 0 {
+		// name resolution by DNS
+		address, err := ascf.DnsLookUp(domainName, dnsServer)
+		if err == nil && address != nil {
+			ipAddr = address.String()
+			log.Println("域名解析成功：", ipAddr)
+			goto Start
 		}
-
-		go ascf.StartServingHTTPRedirect(http.StatusFound)
-		go ascf.StartServingTCPProxy(":443", ipAddr+":443")
-	} else if mode == Lproxy {
-		fmt.Println("程序设定为代理模式")
-		serveNode = append(serveNode, "tcp://:80/"+domainName+":80")
-		serveNode = append(serveNode, "tcp://:443/"+domainName+":443")
-
-		// 代理服务器：请新建一个go文件，定义ProxyServer变量
-		// 如 var ProxyServer = "kcp://8.8.8.8:8888"
-		chainNode = append(chainNode, ProxyServer)
-		var routes = ascf.NewGost(chainNode, serveNode)
-		go routes.StartGostServing()
+		// online lookup via http
+		address, err = ascf.HttpLookup(domainName)
+		if err == nil && address != nil {
+			ipAddr = address.String()
+			log.Println("获取IP地址成功：", ipAddr)
+			goto Start
+		}
+		// using preset ip address
+		ipAddr = defaultIP
+		log.Println("获取IP地址失败，使用备用IP地址：", ipAddr)
 	} else {
-		log.Fatal("程序参数错误")
+		ipAddr = fixedIP
+		log.Println("使用手动指定的IP地址：", ipAddr)
 	}
 
-	fmt.Println("程序已经启动，正在监听80和443端口，现在可正常访问Steam社区！")
-	fmt.Println("此时请不要关闭该窗口，否则程序将会退出！")
-
+Start:
+	fmt.Println("\n程序已启动，请不要关闭该窗口！")
 	fmt.Println()
-	fmt.Println("对于Mac和Linux用户，使用nohup命令运行程序可使其在后台运行。")
-	fmt.Println("\t└─ 在终端中进入程序所在目录后执行 “nohup sudo ./ascf &”即可。")
+	fmt.Println("对于Mac和Linux用户，使用nohup命令运行程序可使其在后台运行。\n" +
+		"\t└─ 在终端中进入程序所在目录后执行 “nohup sudo ./ascf &”即可。")
+	go ascf.StartServingHTTPRedirect(http.StatusFound)
+	go ascf.StartServingTCPProxy(":443", ipAddr+":443")
+
 	select {
 	case <-interrupt:
 		removeHosts()
