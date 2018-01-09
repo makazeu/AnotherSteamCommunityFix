@@ -4,21 +4,8 @@ import (
 	"net"
 	"log"
 	"time"
+	"io"
 )
-
-func pipeAndClose(src, dst net.Conn) {
-	buf := make([]byte, 81920)
-	for {
-		n, err := src.Read(buf)
-		if err != nil {
-			break
-		}
-
-		if _, err := dst.Write(buf[:n]); err != nil {
-			break
-		}
-	}
-}
 
 func handleConn(conn net.Conn, remote string) {
 	defer conn.Close()
@@ -30,8 +17,8 @@ func handleConn(conn net.Conn, remote string) {
 	}
 	defer remoteConn.Close()
 
-	go pipeAndClose(remoteConn, conn)
-	pipeAndClose(conn, remoteConn)
+	go io.Copy(conn, remoteConn)
+	io.Copy(remoteConn, conn)
 }
 
 func StartServingTCPProxy(local, remote string) {

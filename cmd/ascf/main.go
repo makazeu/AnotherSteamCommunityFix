@@ -12,10 +12,14 @@ import (
 )
 
 var (
-	version    = "1.2.0"
+	version    = "1.2.1"
 	domainName = "steamcommunity.com"
-	dnsServer  = "208.67.222.222:5353"
-	defaultIP  = "104.125.0.135"
+	defaultIP  = "104.125.0.135" // 台灣台北市 Akamai CDN
+	dnsList    = map[string]string{
+		"OpenDNS_1": "208.67.222.222:5353",
+		"OpenDNS_2": "208.67.220.220:443",
+		"OpenDNS_2-fs": "208.67.220.123:443",
+	}
 
 	fixedIP string
 )
@@ -38,7 +42,7 @@ func main() {
 	var ipAddr string
 	if len(fixedIP) == 0 {
 		// name resolution by DNS
-		address, err := ascf.DnsLookUp(domainName, dnsServer)
+		address, err := ascf.DnsLookUp(domainName, dnsList)
 		if err == nil && address != nil {
 			ipAddr = address.String()
 			log.Println("域名解析成功：", ipAddr)
@@ -64,6 +68,7 @@ Start:
 	fmt.Println()
 	fmt.Println("对于Mac和Linux用户，使用nohup命令运行程序可使其在后台运行。\n" +
 		"\t└─ 在终端中进入程序所在目录后执行 “nohup sudo ./ascf &”即可。")
+
 	go ascf.StartServingHTTPRedirect(http.StatusFound)
 	go ascf.StartServingTCPProxy(":443", ipAddr+":443")
 
