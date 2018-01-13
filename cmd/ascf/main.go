@@ -7,17 +7,21 @@ import (
 	"fmt"
 	"flag"
 	"net/http"
+	"runtime"
+	"time"
 
 	ascf "github.com/zyfworks/AnotherSteamCommunityFix"
+	"github.com/bitly/go-simplejson"
 )
 
 var (
-	version    = "1.2.1"
+	version    = "1.2.2"
 	domainName = "steamcommunity.com"
-	defaultIP  = "104.125.0.135" // 台灣台北市 Akamai CDN
-	dnsList    = map[string]string{
-		"OpenDNS_1": "208.67.222.222:5353",
-		"OpenDNS_2": "208.67.220.220:443",
+	//defaultIP  = "104.125.0.135" // 台灣台北市 Akamai CDN
+	defaultIP = "23.10.6.47" // 日本東京都 Akamai CDN
+	dnsList   = map[string]string{
+		"OpenDNS_1":    "208.67.222.222:5353",
+		"OpenDNS_2":    "208.67.220.220:443",
 		"OpenDNS_2-fs": "208.67.220.123:443",
 	}
 
@@ -32,6 +36,7 @@ func init() {
 
 func main() {
 	sayHello()
+	checkVersion()
 	addHosts()
 
 	interrupt := make(chan os.Signal)
@@ -94,4 +99,32 @@ func sayHello() {
 	fmt.Printf("~ 欢迎使用AnotherSteamCommunityFix v%s ~\n", version)
 	fmt.Println("Author: Makazeu [ Steam: Makazeu | Weibo: @Makazeu ]")
 	fmt.Println()
+}
+
+func checkVersion() {
+	platform := runtime.GOOS + "_" + runtime.GOARCH
+	client := &http.Client{Timeout: 5 * time.Second}
+	r, err := client.Get("https://up.w21.win/update?" +
+		"name=ascf&platform=" + platform + "&version=" + version)
+	if err != nil {
+		return
+	}
+	defer r.Body.Close()
+
+	json, err := simplejson.NewFromReader(r.Body)
+	if err != nil {
+		return
+	}
+	isOK, err := json.Get("ok").Bool()
+	if err != nil || !isOK {
+		return
+	}
+
+	newVersion, err := json.Get("version").String()
+	if err != nil {
+		return
+	}
+	if newVersion != version {
+		fmt.Println("检测到新版本：" + newVersion + "，下载地址： https://steamcn.com/t339641-1-1")
+	}
 }

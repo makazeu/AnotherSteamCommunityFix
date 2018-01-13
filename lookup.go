@@ -24,7 +24,7 @@ func DnsLookUp(domainName string, dnsList map[string]string) (net.IP, error) {
 			r, t, err := client.Exchange(msg, dnsAddress)
 			if err == nil && len(r.Answer) > 0 {
 				log.Printf("使用%s解析域名成功，耗时: %v\n", dnsName, t)
-				return r.Answer[rand.Int() % len(r.Answer)].(*dns.A).A, nil
+				return r.Answer[rand.Int()%len(r.Answer)].(*dns.A).A, nil
 			}
 		}
 		log.Printf("使用%s解析域名失败...", dnsName)
