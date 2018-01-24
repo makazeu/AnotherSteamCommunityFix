@@ -30,7 +30,7 @@ func StartServingTCPProxy(local, remote string) {
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			fatalLogger.Fatal("accept tcp error:", err)
+			log.Println("accept tcp error:", err)
 		}
 		go handleConn(conn, remote)
 	}

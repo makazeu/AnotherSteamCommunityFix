@@ -14,6 +14,10 @@ import (
 
 const RETRY = 5
 
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
+
 func DnsLookUp(domainName string, dnsList map[string]string) (net.IP, error) {
 	client := &dns.Client{Net: "tcp"}
 	msg := &dns.Msg{}
