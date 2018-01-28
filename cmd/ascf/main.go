@@ -15,10 +15,9 @@ import (
 )
 
 var (
-	version    = "1.2.2"
+	version    = "1.2.3"
 	domainName = "steamcommunity.com"
-	//defaultIP  = "104.125.0.135" // 台灣台北市 Akamai CDN
-	defaultIP = "23.10.6.47" // 日本東京都 Akamai CDN
+	defaultIP = "184.26.221.151" // 日本東京都 Akamai CDN
 	dnsList   = map[string]string{
 		"OpenDNS_1":    "208.67.222.222:5353",
 		"OpenDNS_2":    "208.67.220.220:443",

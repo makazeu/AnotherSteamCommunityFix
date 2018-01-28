@@ -1,5 +1,5 @@
 @echo off
-set Version=1.2.2
+set Version=1.2.3
 echo v%Version%
 
 md builds
