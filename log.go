@@ -1,8 +1,8 @@
 package AnotherSteamCommunityFix
 
 import (
-	"os"
 	"log"
+	"os"
 )
 
 var fatalLogger *log.Logger

@@ -1,32 +1,30 @@
 package AnotherSteamCommunityFix
 
 import (
-	"net/http"
 	"net"
+	"net/http"
 )
 
-var statusCode int
-
-func redirect(w http.ResponseWriter, req *http.Request) {
+func redirectHTTPS(w http.ResponseWriter, req *http.Request) {
 	target := "https://" + req.Host + req.URL.Path
 	if len(req.URL.RawQuery) > 0 {
 		target += "?" + req.URL.RawQuery
 	}
-	http.Redirect(w, req, target, statusCode)
+	http.Redirect(w, req, target, http.StatusFound)
 }
 
-func StartServingHTTPRedirect(httpCode int) {
-	statusCode = httpCode
-	fatalLogger.Fatal(ListenAndServe(":80", http.HandlerFunc(redirect)))
+func StartServingHTTPSRedirect() {
+	server := &Server{
+		http.Server{
+			Addr:    ":80",
+			Handler: http.HandlerFunc(redirectHTTPS),
+		},
+	}
+	fatalLogger.Fatal(server.ListenAndServe())
 }
 
 type Server struct {
 	http.Server
-}
-
-func ListenAndServe(addr string, handler http.Handler) error {
-	server := &Server{http.Server{Addr:addr, Handler:handler}}
-	return server.ListenAndServe()
 }
 
 func (srv *Server) ListenAndServe() error {

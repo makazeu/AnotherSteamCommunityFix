@@ -1,10 +1,10 @@
 package AnotherSteamCommunityFix
 
 import (
-	"net"
-	"log"
-	"time"
 	"io"
+	"log"
+	"net"
+	"time"
 )
 
 func handleConn(conn net.Conn, remote string) {

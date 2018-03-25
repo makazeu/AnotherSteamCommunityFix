@@ -1,24 +1,24 @@
-﻿package main
+package main
 
 import (
+	"flag"
+	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
-	"fmt"
-	"flag"
-	"net/http"
 	"runtime"
 	"time"
 
-	ascf "github.com/zyfworks/AnotherSteamCommunityFix"
 	"github.com/bitly/go-simplejson"
+	ascf "github.com/zyfworks/AnotherSteamCommunityFix"
 )
 
 var (
 	version    = "1.2.3"
 	domainName = "steamcommunity.com"
-	defaultIP = "184.26.221.151" // 日本東京都 Akamai CDN
-	dnsList   = map[string]string{
+	defaultIP  = "184.26.221.151" // 日本東京都 Akamai CDN
+	dnsList    = map[string]string{
 		"OpenDNS_1":    "208.67.222.222:5353",
 		"OpenDNS_2":    "208.67.220.220:443",
 		"OpenDNS_2-fs": "208.67.220.123:443",
@@ -73,7 +73,7 @@ Start:
 	fmt.Println("对于Mac和Linux用户，使用nohup命令运行程序可使其在后台运行。\n" +
 		"\t└─ 在终端中进入程序所在目录后执行 “nohup sudo ./ascf &”即可。")
 
-	go ascf.StartServingHTTPRedirect(http.StatusFound)
+	go ascf.StartServingHTTPSRedirect()
 	go ascf.StartServingTCPProxy(":443", ipAddr+":443")
 
 	select {

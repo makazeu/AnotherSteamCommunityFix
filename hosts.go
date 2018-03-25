@@ -1,11 +1,11 @@
 package AnotherSteamCommunityFix
 
 import (
-	"github.com/zyfworks/goodhosts"
 	"errors"
+	"github.com/zyfworks/goodhosts"
 )
 
-func AddHosts(ip string, hostEntries ... string) error {
+func AddHosts(ip string, hostEntries ...string) error {
 	hosts, err := goodhosts.NewHosts()
 	if err != nil {
 		return err
@@ -22,7 +22,7 @@ func AddHosts(ip string, hostEntries ... string) error {
 	return hosts.Flush()
 }
 
-func RemoveHosts(ip string, hostEntries ... string) error {
+func RemoveHosts(ip string, hostEntries ...string) error {
 	hosts, err := goodhosts.NewHosts()
 	if err != nil {
 		return err

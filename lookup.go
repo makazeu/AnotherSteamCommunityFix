@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/miekg/dns"
 	"github.com/bitly/go-simplejson"
+	"github.com/miekg/dns"
 )
 
 const RETRY = 5
