@@ -124,6 +124,6 @@ func checkVersion() {
 		return
 	}
 	if newVersion != version {
-		fmt.Println("检测到新版本：" + newVersion + "，下载地址： https://steamcn.com/t339641-1-1")
+		fmt.Println("检测到新版本：" + newVersion + "，下载地址： https://keylol.com/t339641-1-1")
 	}
 }
